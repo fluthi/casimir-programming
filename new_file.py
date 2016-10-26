@@ -7,3 +7,5 @@ def circ(r):
 
 def area(r):
     return np.pi*r**2
+
+import script.py
