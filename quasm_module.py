@@ -87,14 +87,6 @@ def single_qubit_gate(gate,qubit_number,number_of_qubits):
             matrix=np.outer(matrix,gate_dict['i'])
     return matrix
 
-def operator_dict_add(operator_name,operator_matrix):
-    """
-    In: operator name and matrix
-    Creates a dictionary entry with the operator name and as a value the matrix
-    Out: -
-    """
-    operator_dict.update({operator_name:operator_matrix})
-    return True
 
 def operator_dict_default():
     """
@@ -104,14 +96,14 @@ def operator_dict_default():
     """
     operator_dict={}
     # add hadamard
-    operator_dict_add('h',1/np.sqrt(2)*np.array([[1,1],[1,-1]]))
+    operator_dict.update({'h',1/np.sqrt(2)*np.array([[1,1],[1,-1]])})
     # add identity
-    operator_dict_add('i',np.array([[1,0],[0,1]])
+    operator_dict.update({'i',np.array([[1,0],[0,1]]})
     # add Pauli X
-    operator_dict_add('x',np.array([[0,1],[1,0]])
+    operator_dict.update({'x',np.array([[0,1],[1,0]]})
     # add Pauli Y
-    operator_dict_add('y',np.array([[0,-1j],[1j,0]])
+    operator_dict.update({'y',np.array([[0,-1j],[1j,0]]})
     # add Pauli Z
-    operator_dict_add('z',np.array([[1,0],[0,-1]])
+    operator_dict.update({'z',np.array([[1,0],[0,-1]]})
     return operator_dict{}
     
