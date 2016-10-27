@@ -1,4 +1,6 @@
 import numpy as np
+import qutip
+from qutip import qip
 
 def load_qasm_file(filename):
     '''
@@ -75,18 +77,26 @@ def single_qubit_gate(gate,qubit_number,number_of_qubits):
     Out: Process matrix with dimension 2**number_of_qubits x 2**number_of_qubits
     '''
     gate_dict=operator_dict_default()
-    single_qubit_gate=gate_dict['gate']
+    single_qubit_gate=gate_dict[gate]
     if qubit_number==0:
         matrix=single_qubit_gate
     else:
         matrix=gate_dict['i']
-    for tt in range(1,len(number_of_qubits)):
+    for tt in range(1,number_of_qubits):
         if tt==qubit_number:
-            matrix=np.outer(matrix,single_qubit_gate)
+            matrix=np.kron(matrix,single_qubit_gate)
         else:
-            matrix=np.outer(matrix,gate_dict['i'])
+            matrix=np.kron(matrix,gate_dict['i'])
     return matrix
 
+def cnot_gate(control,target,number_of_qubits):
+    '''
+    In: control qubit, starting with 0, target qubit, starting with 0, number of qubits
+    ---
+    Out: Matrix for the gate
+    '''
+    return qip.cnot(N=number_of_qubits, control=control, target=target)
+    
 
 def operator_dict_default():
     """
@@ -96,14 +106,14 @@ def operator_dict_default():
     """
     operator_dict={}
     # add hadamard
-    operator_dict.update({'h',1/np.sqrt(2)*np.array([[1,1],[1,-1]])})
+    operator_dict.update({'h':1/np.sqrt(2)*np.array([[1,1],[1,-1]])})
     # add identity
-    operator_dict.update({'i',np.array([[1,0],[0,1]])})
+    operator_dict.update({'i':np.array([[1,0],[0,1]])})
     # add Pauli X
-    operator_dict.update({'x',np.array([[0,1],[1,0]])})
+    operator_dict.update({'x':np.array([[0,1],[1,0]])})
     # add Pauli Y
-    operator_dict.update({'y',np.array([[0,-1j],[1j,0]])})
+    operator_dict.update({'y':np.array([[0,-1j],[1j,0]])})
     # add Pauli Z
-    operator_dict.update({'z',np.array([[1,0],[0,-1]])})
-    return operator_dict{}
+    operator_dict.update({'z':np.array([[1,0],[0,-1]])})
+    return operator_dict
     
