@@ -69,7 +69,20 @@ def read_instruction_line(instructions):
         operator = instruction[0]
         qubits = instruction[1].split(",")   
     return [operator, [qubits]]
-        
+
+def read_qubits_string(qubits):
+    """
+    In: list with qubit names
+    ----
+    Out: returns a list with qubit numbers
+    """
+    qubit_numbers=[]
+    for i in range(len(qubits)-1):
+        name=qubits[i]
+        number=name[1:len(name)-1]
+        qubit_numbers[i]=number
+    return qubit_numbers
+
 def single_qubit_gate(gate,qubit_number,number_of_qubits):
     '''
     In: which gate is to be applied, qubit_number: which qubit is acted on (first qubit is 0), number_of_qubits: total number of qubits
@@ -116,4 +129,11 @@ def operator_dict_default():
     # add Pauli Z
     operator_dict.update({'z':np.array([[1,0],[0,-1]])})
     return operator_dict
+
+    
+class qubits:
+    def __init__(self,number_of_qubits=1):  # The function used when the object is created.
+        self.number_of_qubits=number_of_qubits
+        self.state=np.zeros(2**number_of_qubits) # construct the state vector
+        self.state[0]=1 #start in the ground state
     
