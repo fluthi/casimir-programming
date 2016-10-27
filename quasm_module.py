@@ -98,12 +98,12 @@ def operator_dict_default():
     # add hadamard
     operator_dict.update({'h',1/np.sqrt(2)*np.array([[1,1],[1,-1]])})
     # add identity
-    operator_dict.update({'i',np.array([[1,0],[0,1]]})
+    operator_dict.update({'i',np.array([[1,0],[0,1]])})
     # add Pauli X
-    operator_dict.update({'x',np.array([[0,1],[1,0]]})
+    operator_dict.update({'x',np.array([[0,1],[1,0]])})
     # add Pauli Y
-    operator_dict.update({'y',np.array([[0,-1j],[1j,0]]})
+    operator_dict.update({'y',np.array([[0,-1j],[1j,0]])})
     # add Pauli Z
-    operator_dict.update({'z',np.array([[1,0],[0,-1]]})
+    operator_dict.update({'z',np.array([[1,0],[0,-1]])})
     return operator_dict{}
     
