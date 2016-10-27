@@ -44,3 +44,27 @@ def number_of_qubits(quasm_instrunctions):
         if 'qubit' in line:
             num_qubits+=1
     return num_qubits
+
+def delete_instruction(instructions,number_to_be_deleted):
+    """
+    In: list of instructions and number of instructions to remove
+    ---
+    Out: list with removed instructions (from top)
+    """
+    return instructions[number_to_be_deleted-1:len(instructions)-1]
+
+def read_instruction_line(instructions):
+    """
+    In: instructions 
+    read the first line
+    recognize the operation and qubit
+    ---
+    Out: list with operation as first entry and list of qubit(s) as second entry
+    """
+    if instructions!=[]:
+        instruction_line=str(instructions[0])
+        instruction = instruction_line.split()
+        operator = instruction[0]
+        qubits = instruction[1].split(",")   
+    return [operator, [qubits]]
+        
