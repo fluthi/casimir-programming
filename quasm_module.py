@@ -1,3 +1,4 @@
+import numpy as np
 
 def load_qasm_file(filename):
     '''
@@ -85,3 +86,32 @@ def single_qubit_gate(gate,qubit_number,number_of_qubits):
         else:
             matrix=np.outer(matrix,gate_dict['i'])
     return matrix
+
+def operator_dict_add(operator_name,operator_matrix):
+    """
+    In: operator name and matrix
+    Creates a dictionary entry with the operator name and as a value the matrix
+    Out: -
+    """
+    operator_dict.update({operator_name:operator_matrix})
+    return True
+
+def operator_dict_default():
+    """
+    In: none
+    Creates a dictionary with default operations
+    Out: none
+    """
+    operator_dict={}
+    # add hadamard
+    operator_dict_add('h',1/np.sqrt(2)*np.array([[1,1],[1,-1]]))
+    # add identity
+    operator_dict_add('i',np.array([[1,0],[0,1]])
+    # add Pauli X
+    operator_dict_add('x',np.array([[0,1],[1,0]])
+    # add Pauli Y
+    operator_dict_add('y',np.array([[0,-1j],[1j,0]])
+    # add Pauli Z
+    operator_dict_add('z',np.array([[1,0],[0,-1]])
+    return operator_dict{}
+    
