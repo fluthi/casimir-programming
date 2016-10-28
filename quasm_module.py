@@ -11,7 +11,7 @@ class qasm:
         self.qasm_instruction_line=[]      
         self.number_of_qubits=1
         self.state=np.array([0,1])
-        self.gate_dict=operator_dict_default()
+        self.gate_dict=self.operator_dict_default()
         pass
     
     def load_qasm_file(self):
@@ -76,9 +76,10 @@ class qasm:
             run_instruction_line(self.qasm_instruction_line)
         return(self.state)
             
-    def run_instruction_line(self,instruction)
+    def run_instruction_line(self,instruction):
                 #redirect to single qubit or multi qubit
                 #call act_gate_on_state()
+                pass
 
     def number_of_qubits(self):
         '''
@@ -129,13 +130,13 @@ class qasm:
                 matrix=np.kron(matrix,self.gate_dict['i'])
         return matrix
 
-    def cnot_gate(self,control,target):
+    def create_cnot_gate(self,control,target):
         '''
         In: control qubit, starting with 0, target qubit, starting with 0, number of qubits
         ---
         Out: Matrix for the gate
         '''
-        return qip.cnot(N=self.number_of_qubits, control=control, target=target)
+        return qip.cnot(N=self.number_of_qubits, control=control, target=target).full()
     
     def act_gate_on_state(self,matrix):
         '''
