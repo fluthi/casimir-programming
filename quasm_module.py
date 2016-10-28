@@ -63,22 +63,49 @@ class qasm:
             qubits = instruction[1].split(",")   
         self.qasm_instruction_line=[operator, [qubits]]
         
+    def read_qubits_string(qubits):
+        """
+        In: list with qubit names
+        ----
+        Out: returns a list with qubit numbers starting at 0.
+        """
+        qubit_numbers=[]
+        for i in range(len(qubits)-1):
+            name=qubits[i]
+            number=name[1:len(name)-1]
+            qubit_numbers[i]=number
+        return qubit_numbers
+        
     def run_algorithm(self):
         """
         load the file, filter the instructions
         run the instructions line by line
         Out: final qubit state.
         """
-        load_qasm_file()
-        get_filtered_qasm()
-        for line_index in self.qasm_instructions:
-            read_instruction_line(line_index)
-            run_instruction_line(self.qasm_instruction_line)
+        self.load_qasm_file()
+        self.get_filtered_qasm()
+        for line_index,line in enumerate(self.qasm_instructions):
+            self.read_instruction_line(line_index)
+            self.run_instruction_line()
         return(self.state)
             
-    def run_instruction_line(self,instruction)
-                #redirect to single qubit or multi qubit
-                #call act_gate_on_state()
+    def run_instruction_line(self):
+        instruction=self.qasm_instruction_line
+        qubits=read_qubits_string(instruction[1])
+        gate_matrix=self.gate_dict.get(instruction[0])
+        matrix=[]
+        if gate_matrix==None:
+            if instruction[0]=='cnot':
+                control=qubits[0]
+                target=qubits[1]
+                matrix=self.create_cnot_gate(control,target)
+                self.act_gate_on_state(matrix)
+            else:
+                raise NameError ('Gate ' + instruction[0] + ' not defined')
+        else:
+            for qubit_number in range(len(qubits)-1):
+                matrix=self.create_single_qubit_gate(instruction[0],qubit_number)
+                self.act_gate_on_state(matrix)
 
     def number_of_qubits(self):
         '''
@@ -95,21 +122,6 @@ class qasm:
     def create_qubits(self):
         self.state=np.zeros(2**self.number_of_qubits) # construct the state vector
         self.state[0]=1 #start in the ground state
-        
-        
-
-    def read_qubits_string(qubits):
-        """
-        In: list with qubit names
-        ----
-        Out: returns a list with qubit numbers
-        """
-        qubit_numbers=[]
-        for i in range(len(qubits)-1):
-            name=qubits[i]
-            number=name[1:len(name)-1]
-            qubit_numbers[i]=number
-        return qubit_numbers
 
     def create_single_qubit_gate(self,gate,qubit_number):
         '''
