@@ -16,7 +16,7 @@ class qasm:
         self.probability_vector=([0,1])
         self.state=np.array([0,1])
         self.gate_dict=self.operator_dict_default()
-        self.measurement_hist
+        self.measurement_hist=[]
         pass
     
     def load_qasm_file(self):
@@ -167,25 +167,25 @@ class qasm:
     def do_measurement(self,number_of_measurements=10000):
         self.get_probability_vector()
         result=0
-        hist=np.array(len(self.probability_vector))
+        hist=np.zeros(len(self.probability_vector))
         for i in range(number_of_measurements):
             result=int(self.measure())
             #add a count to the histogram
-            hist(result)+=1
+            hist[result]+=1.
         hist=hist/number_of_measurements
         self.measurement_hist=hist
         self.plot_measurement_hist()
         
     def plot_measurement_hist(self):
         plt.hist(self.measurement_hist)
-        plt.xlabel(self.measurent_hist_xlabel())
+        plt.xlabel(self.measurement_hist_xlabel())
         plt.show()
         
-    def measurement_hist_xlabel(self)
+    def measurement_hist_xlabel(self):
         #just take binary of the index
         label=[]
         for i in range(len(self.probability_vector)):
-            label.append("{0:b}".format(i)
+            label.append("{0:b}".format(i))
         return label
     
     def act_gate_on_state(self,matrix):
@@ -225,7 +225,7 @@ class qasm:
     
     def measure(self):
         weights=self.probability_vector
-        values=range(self.number_of_qubits)
+        values=range(2**self.number_of_qubits)
         total = 0
         cum_weights = []
         for w in weights:
