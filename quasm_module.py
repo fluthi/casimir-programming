@@ -12,7 +12,7 @@ class qasm:
         self.last_qubit_line_index=int(0)
         self.number_of_qubits=1
         self.state=np.array([0,1])
-        self.gate_dict=operator_dict_default()
+        self.gate_dict=self.operator_dict_default()
         pass
     
     def load_qasm_file(self):
@@ -36,7 +36,7 @@ class qasm:
         qasm_instructions=[]
         m=0
         for tt, line in enumerate(self.qasm_file):
-            if line[0]=='#':
+            if line[0]=='#' or line.split()==[]:
                 m+=1
                 pass
             else:
@@ -62,20 +62,21 @@ class qasm:
             instruction = instruction_line.split()
             operator = instruction[0]
             qubits = instruction[1].split(",")   
-        self.qasm_instruction_line=[operator, [qubits]]
+        self.qasm_instruction_line=[operator, qubits]
         
-    def read_qubits_string(qubits):
+    def read_qubits_string(self,qubits):
         """
         In: list with qubit names
         ----
         Out: returns a list with qubit numbers starting at 0.
         """
         qubit_numbers=[]
-        for i in range(len(qubits)-1):
+        for i in range(len(qubits)):
             name=qubits[i]
-            number=name[1:len(name)-1]
-            qubit_numbers[i]=number
-        return qubit_numbers
+            number=name[1::]
+            qubit_numbers.append(int(number))
+        self.qubit_numbers=qubit_numbers
+        #return qubit_numbers
         
     def run_algorithm(self):
         """
@@ -85,16 +86,17 @@ class qasm:
         """
         self.load_qasm_file()
         self.get_filtered_qasm()
-        self.number_of_qubits()
+        self.get_number_of_qubits()
         self.create_qubits()
         for line_index,line in enumerate(self.qasm_instructions[self.last_qubit_line_index::]):
-            self.read_instruction_line(line_index)
+            self.read_instruction_line(line_index+self.last_qubit_line_index)
             self.run_instruction_line()
         return(self.state)
             
     def run_instruction_line(self):
         instruction=self.qasm_instruction_line
-        qubits=read_qubits_string(instruction[1])
+        self.read_qubits_string(instruction[1])
+        qubits=self.qubit_numbers
         gate_matrix=self.gate_dict.get(instruction[0])
         matrix=[]
         if gate_matrix==None:
@@ -106,24 +108,25 @@ class qasm:
             else:
                 raise NameError ('Gate ' + instruction[0] + ' not defined')
         else:
-            for qubit_number in range(len(qubits)-1):
+            for qubit_number in range(len(qubits)):
                 matrix=self.create_single_qubit_gate(instruction[0],qubit_number)
+                print(matrix)
                 self.act_gate_on_state(matrix)
 
-    def number_of_qubits(self):
+    def get_number_of_qubits(self):
         '''
         In: filtered quasm instructions
         ---
         Out: integer with number of needed qubits
         '''
         num_qubits=0
-        qubit_line_index-0
+        last_qubit_line_index=0
         for line_index, line in enumerate(self.qasm_instructions):
             if 'qubit' in line:
                 num_qubits+=1
                 last_qubit_line_index=line_index
         self.number_of_qubits=num_qubits
-        self.last_qubit_line_index=last_qubit_line_index
+        self.last_qubit_line_index=last_qubit_line_index+1
     
     def create_qubits(self):
         self.state=np.zeros(2**self.number_of_qubits) # construct the state vector
@@ -147,13 +150,13 @@ class qasm:
                 matrix=np.kron(matrix,self.gate_dict['i'])
         return matrix
 
-    def cnot_gate(self,control,target):
+    def create_cnot_gate(self,control,target):
         '''
         In: control qubit, starting with 0, target qubit, starting with 0, number of qubits
         ---
         Out: Matrix for the gate
         '''
-        return qip.cnot(N=self.number_of_qubits, control=control, target=target)
+        return qip.cnot(N=self.number_of_qubits, control=control, target=target).full()
     
     def act_gate_on_state(self,matrix):
         '''
