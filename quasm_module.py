@@ -106,6 +106,8 @@ class qasm:
                 target=qubits[1]
                 matrix=self.create_cnot_gate(control,target)
                 self.act_gate_on_state(matrix)
+            elif instruction[0]=='measure':
+                self.do_measurement()
             else:
                 raise NameError ('Gate ' + instruction[0] + ' not defined')
         else:
@@ -159,6 +161,18 @@ class qasm:
         '''
         return qip.cnot(N=self.number_of_qubits, control=control, target=target).full()
     
+    def do_measurement(self,number_of_measurements=10000):
+        self.get_probability_vector()
+        prob_vector=self.probability vector
+        result=0
+        hist=np.array(len(prob_vector))
+        for i in range(number_of_measurements):
+            result=self.measure()
+            #add a count to the histogram
+            hist(result)+=1
+        return hist
+            
+    
     def act_gate_on_state(self,matrix):
         '''
         In: Matrix that should be acted on the qubits
@@ -180,6 +194,8 @@ class qasm:
         operator_dict.update({'h':1/np.sqrt(2)*np.array([[1,1],[1,-1]])})
         # add identity
         operator_dict.update({'i':np.array([[1,0],[0,1]])})
+        # add identity
+        operator_dict.update({'nop':np.array([[1,0],[0,1]])})
         # add Pauli X
         operator_dict.update({'x':np.array([[0,1],[1,0]])})
         # add Pauli Y
@@ -192,3 +208,6 @@ class qasm:
         self.probability_vector=self.state**2
         
     
+    def measure(self,prob_vector):
+        self.probability_vector
+        return measurement_outcome
