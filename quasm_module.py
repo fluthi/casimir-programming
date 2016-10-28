@@ -3,7 +3,7 @@ import qutip
 from qutip import qip
 from random import random
 from bisect import bisect
-
+import matplotlib.pyplot as plt
    
 class qasm:
     def __init__(self,filename):  # The function used when the object is created.
@@ -16,6 +16,7 @@ class qasm:
         self.probability_vector=([0,1])
         self.state=np.array([0,1])
         self.gate_dict=self.operator_dict_default()
+        self.measurement_hist
         pass
     
     def load_qasm_file(self):
@@ -165,15 +166,27 @@ class qasm:
     
     def do_measurement(self,number_of_measurements=10000):
         self.get_probability_vector()
-        prob_vector=self.probability vector
         result=0
-        hist=np.array(len(prob_vector))
+        hist=np.array(len(self.probability_vector))
         for i in range(number_of_measurements):
-            result=self.measure()
+            result=int(self.measure())
             #add a count to the histogram
             hist(result)+=1
-        return hist
-            
+        hist=hist/number_of_measurements
+        self.measurement_hist=hist
+        self.plot_measurement_hist()
+        
+    def plot_measurement_hist(self):
+        plt.hist(self.measurement_hist)
+        plt.xlabel(self.measurent_hist_xlabel())
+        plt.show()
+        
+    def measurement_hist_xlabel(self)
+        #just take binary of the index
+        label=[]
+        for i in range(len(self.probability_vector)):
+            label.append("{0:b}".format(i)
+        return label
     
     def act_gate_on_state(self,matrix):
         '''
