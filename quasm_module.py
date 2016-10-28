@@ -8,10 +8,11 @@ class qasm:
         self.filename=filename
         self.qasm_file=[]
         self.qasm_instructions=[]
-        self.qasm_instruction_line=[]      
+        self.qasm_instruction_line=[]
+        self.last_qubit_line_index=int(0)
         self.number_of_qubits=1
         self.state=np.array([0,1])
-        self.gate_dict=self.operator_dict_default()
+        self.gate_dict=operator_dict_default()
         pass
     
     def load_qasm_file(self):
@@ -84,12 +85,13 @@ class qasm:
         """
         self.load_qasm_file()
         self.get_filtered_qasm()
-        for line_index,line in enumerate(self.qasm_instructions):
+        self.number_of_qubits()
+        self.create_qubits()
+        for line_index,line in enumerate(self.qasm_instructions[self.last_qubit_line_index::]):
             self.read_instruction_line(line_index)
             self.run_instruction_line()
         return(self.state)
             
-
     def run_instruction_line(self):
         instruction=self.qasm_instruction_line
         qubits=read_qubits_string(instruction[1])
@@ -115,10 +117,13 @@ class qasm:
         Out: integer with number of needed qubits
         '''
         num_qubits=0
-        for line in self.qasm_instructions:
+        qubit_line_index-0
+        for line_index, line in enumerate(self.qasm_instructions):
             if 'qubit' in line:
                 num_qubits+=1
+                last_qubit_line_index=line_index
         self.number_of_qubits=num_qubits
+        self.last_qubit_line_index=last_qubit_line_index
     
     def create_qubits(self):
         self.state=np.zeros(2**self.number_of_qubits) # construct the state vector
@@ -142,13 +147,13 @@ class qasm:
                 matrix=np.kron(matrix,self.gate_dict['i'])
         return matrix
 
-    def create_cnot_gate(self,control,target):
+    def cnot_gate(self,control,target):
         '''
         In: control qubit, starting with 0, target qubit, starting with 0, number of qubits
         ---
         Out: Matrix for the gate
         '''
-        return qip.cnot(N=self.number_of_qubits, control=control, target=target).full()
+        return qip.cnot(N=self.number_of_qubits, control=control, target=target)
     
     def act_gate_on_state(self,matrix):
         '''
