@@ -6,6 +6,10 @@ from qutip import qip
 class qasm:
     def __init__(self,filename):  # The function used when the object is created.
         self.filename=filename
+        
+        self.number_of_qubits=1
+        self.state=np.array([0,1])
+        self.gate_dict=operator_dict_default()
         pass
     
     def load_qasm_file(self):
@@ -41,21 +45,20 @@ class qasm:
                         break
         return quasm_instrunctions
 
-    def number_of_qubits(quasm_instrunctions):
+    def number_of_qubits(self):
         '''
         In: filtered quasm instructions
         ---
         Out: integer with number of needed qubits
         '''
         num_qubits=0
-        for line in quasm_instrunctions:
+        for line in self.qasm_instructions:
             if 'qubit' in line:
                 num_qubits+=1
-        return num_qubits
+        self.number_of_qubits=num_qubits
     
-    def create_qubits(number_qubits):
-        self.number_of_qubits=number_of_qubits
-        self.state=np.zeros(2**number_of_qubits) # construct the state vector
+    def create_qubits(self):
+        self.state=np.zeros(2**self.number_of_qubits) # construct the state vector
         self.state[0]=1 #start in the ground state
         
         
@@ -87,35 +90,43 @@ class qasm:
             qubit_numbers[i]=number
         return qubit_numbers
 
-    def single_qubit_gate(gate,qubit_number,number_of_qubits):
+    def create_single_qubit_gate(self,gate,qubit_number):
         '''
         In: which gate is to be applied, qubit_number: which qubit is acted on (first qubit is 0), number_of_qubits: total number of qubits
         ---
         Out: Process matrix with dimension 2**number_of_qubits x 2**number_of_qubits
         '''
-        gate_dict=operator_dict_default()
-        single_qubit_gate=gate_dict[gate]
+        single_qubit_gate=self.gate_dict[gate]
         if qubit_number==0:
             matrix=single_qubit_gate
         else:
-            matrix=gate_dict['i']
-        for tt in range(1,number_of_qubits):
+            matrix=self.gate_dict['i']
+        for tt in range(1,self.number_of_qubits):
             if tt==qubit_number:
                 matrix=np.kron(matrix,single_qubit_gate)
             else:
-                matrix=np.kron(matrix,gate_dict['i'])
+                matrix=np.kron(matrix,self.gate_dict['i'])
         return matrix
 
-    def cnot_gate(control,target,number_of_qubits):
+    def cnot_gate(self,control,target):
         '''
         In: control qubit, starting with 0, target qubit, starting with 0, number of qubits
         ---
         Out: Matrix for the gate
         '''
-        return qip.cnot(N=number_of_qubits, control=control, target=target)
+        return qip.cnot(N=self.number_of_qubits, control=control, target=target)
+    
+    def act_gate_on_state(self,matrix):
+        '''
+        In: Matrix that should be acted on the qubits
+        ---
+        Out: -    updates the state of the qubit
+        '''
+        old_state=self.state
+        new_state=np.dot(matrix,old_state)
+        self.state=new_state
 
-
-    def operator_dict_default():
+    def operator_dict_default(self):
         """
         In: none
         Creates a dictionary with default operations
