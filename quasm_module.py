@@ -6,40 +6,76 @@ from qutip import qip
 class qasm:
     def __init__(self,filename):  # The function used when the object is created.
         self.filename=filename
+        self.qasm_file=[]
+        self.qasm_instructions=[]
+        self.qasm_instruction_line=[]
         pass
     
     def load_qasm_file(self):
-    '''
-    Reads in a .qasm file. filename a string with the filename, eg. 'test1.qasm'
-    ---
-    Return: List of strings with all characters in the file
-    '''
-    quasm_file=[]
-    f=open(self.filename,'r')
-    for line in f:
-        quasm_file.append(line)
-    return quasm_file
+        '''
+        Reads in a .qasm file. filename a string with the filename, eg. 'test1.qasm'
+        ---
+        Return: List of strings with all characters in the file
+        '''
+        qasm_file=[]
+        f=open(self.filename,'r')
+        for line in f:
+            qasm_file.append(line)
+        self.qasm_file=qasm_file
 
-    def get_filtered_qasm(list_of_qasm_strings):
+    def get_filtered_qasm(self):
         '''
         In: List of strings with comments
         ---
         Return: list of strings without comments
         '''
-        quasm_instrunctions=[]
+        qasm_instructions=[]
         m=0
-        for tt, line in enumerate(list_of_qasm_strings):
+        for tt, line in enumerate(self.qasm_file):
             if line[0]=='#':
                 m+=1
                 pass
             else:
-                quasm_instrunctions.append('')
+                qasm_instructions.append('')
                 for char in line:
                     if not char=='#':
-                        quasm_instrunctions[tt-m]+=char
+                        qasm_instructions[tt-m]+=char
                     else:
                         break
-        return quasm_instrunctions
+        self.qasm_instructions=qasm_instructions
+        
+    def read_instruction_line(self,line_index):
+        """
+        In: instructions 
+        read the first line
+        recognize the operation and qubit
+        ---
+        Out: list with operation as first entry and list of qubit(s) as second entry
+        """
+        instructions=self.qasm_instructions
+        if instructions!=[]:
+            instruction_line=str(instructions[line_index])
+            instruction = instruction_line.split()
+            operator = instruction[0]
+            qubits = instruction[1].split(",")   
+        self.qasm_instruction_line=[operator, [qubits]]
+        
+    def run_algorithm(self):
+        """
+        load the file, filter the instructions
+        run the instructions line by line
+        Out: final qubit state.
+        """
+        load_qasm_file()
+        get_filtered_qasm()
+        for line_index in self.qasm_instructions:
+            read_instruction_line(line_index)
+            run_instruction_line(self.qasm_instruction_line)
+        return(self.state)
+            
+    def run_instruction_line(self,instruction)
+                #redirect to single qubit or multi qubit
+                #call act_gate_on_state()
 
     def number_of_qubits(quasm_instrunctions):
         '''
@@ -59,20 +95,6 @@ class qasm:
         self.state[0]=1 #start in the ground state
         
         
-    def read_instruction_line(instructions):
-        """
-        In: instructions 
-        read the first line
-        recognize the operation and qubit
-        ---
-        Out: list with operation as first entry and list of qubit(s) as second entry
-        """
-        if instructions!=[]:
-            instruction_line=str(instructions[0])
-            instruction = instruction_line.split()
-            operator = instruction[0]
-            qubits = instruction[1].split(",")   
-        return [operator, [qubits]]
 
     def read_qubits_string(qubits):
         """
