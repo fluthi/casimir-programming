@@ -2,138 +2,135 @@ import numpy as np
 import qutip
 from qutip import qip
 
-def load_qasm_file(filename):
+   
+class qasm:
+    def __init__(self,filename):  # The function used when the object is created.
+        self.filename=filename
+        pass
+    
+    def load_qasm_file(self):
     '''
     Reads in a .qasm file. filename a string with the filename, eg. 'test1.qasm'
     ---
     Return: List of strings with all characters in the file
     '''
     quasm_file=[]
-    f=open(filename,'r')
+    f=open(self.filename,'r')
     for line in f:
         quasm_file.append(line)
     return quasm_file
 
-def get_filtered_qasm(list_of_qasm_strings):
-    '''
-    In: List of strings with comments
-    ---
-    Return: list of strings without comments
-    '''
-    quasm_instrunctions=[]
-    m=0
-    for tt, line in enumerate(list_of_qasm_strings):
-        if line[0]=='#':
-            m+=1
-            pass
-        else:
-            quasm_instrunctions.append('')
-            for char in line:
-                if not char=='#':
-                    quasm_instrunctions[tt-m]+=char
-                else:
-                    break
-    return quasm_instrunctions
+    def get_filtered_qasm(list_of_qasm_strings):
+        '''
+        In: List of strings with comments
+        ---
+        Return: list of strings without comments
+        '''
+        quasm_instrunctions=[]
+        m=0
+        for tt, line in enumerate(list_of_qasm_strings):
+            if line[0]=='#':
+                m+=1
+                pass
+            else:
+                quasm_instrunctions.append('')
+                for char in line:
+                    if not char=='#':
+                        quasm_instrunctions[tt-m]+=char
+                    else:
+                        break
+        return quasm_instrunctions
 
-def number_of_qubits(quasm_instrunctions):
-    '''
-    In: filtered quasm instructions
-    ---
-    Out: integer with number of needed qubits
-    '''
-    num_qubits=0
-    for line in quasm_instrunctions:
-        if 'qubit' in line:
-            num_qubits+=1
-    return num_qubits
-
-def delete_instruction(instructions,number_to_be_deleted=1):
-    """
-    In: list of instructions and number of instructions to remove
-    ---
-    Out: list with removed instructions (from top)
-    """
-    return instructions[number_to_be_deleted:len(instructions)-1]
-
-def read_instruction_line(instructions):
-    """
-    In: instructions 
-    read the first line
-    recognize the operation and qubit
-    ---
-    Out: list with operation as first entry and list of qubit(s) as second entry
-    """
-    if instructions!=[]:
-        instruction_line=str(instructions[0])
-        instruction = instruction_line.split()
-        operator = instruction[0]
-        qubits = instruction[1].split(",")   
-    return [operator, [qubits]]
-
-def read_qubits_string(qubits):
-    """
-    In: list with qubit names
-    ----
-    Out: returns a list with qubit numbers
-    """
-    qubit_numbers=[]
-    for i in range(len(qubits)-1):
-        name=qubits[i]
-        number=name[1:len(name)-1]
-        qubit_numbers[i]=number
-    return qubit_numbers
-
-def single_qubit_gate(gate,qubit_number,number_of_qubits):
-    '''
-    In: which gate is to be applied, qubit_number: which qubit is acted on (first qubit is 0), number_of_qubits: total number of qubits
-    ---
-    Out: Process matrix with dimension 2**number_of_qubits x 2**number_of_qubits
-    '''
-    gate_dict=operator_dict_default()
-    single_qubit_gate=gate_dict[gate]
-    if qubit_number==0:
-        matrix=single_qubit_gate
-    else:
-        matrix=gate_dict['i']
-    for tt in range(1,number_of_qubits):
-        if tt==qubit_number:
-            matrix=np.kron(matrix,single_qubit_gate)
-        else:
-            matrix=np.kron(matrix,gate_dict['i'])
-    return matrix
-
-def cnot_gate(control,target,number_of_qubits):
-    '''
-    In: control qubit, starting with 0, target qubit, starting with 0, number of qubits
-    ---
-    Out: Matrix for the gate
-    '''
-    return qip.cnot(N=number_of_qubits, control=control, target=target)
+    def number_of_qubits(quasm_instrunctions):
+        '''
+        In: filtered quasm instructions
+        ---
+        Out: integer with number of needed qubits
+        '''
+        num_qubits=0
+        for line in quasm_instrunctions:
+            if 'qubit' in line:
+                num_qubits+=1
+        return num_qubits
     
-
-def operator_dict_default():
-    """
-    In: none
-    Creates a dictionary with default operations
-    Out: none
-    """
-    operator_dict={}
-    # add hadamard
-    operator_dict.update({'h':1/np.sqrt(2)*np.array([[1,1],[1,-1]])})
-    # add identity
-    operator_dict.update({'i':np.array([[1,0],[0,1]])})
-    # add Pauli X
-    operator_dict.update({'x':np.array([[0,1],[1,0]])})
-    # add Pauli Y
-    operator_dict.update({'y':np.array([[0,-1j],[1j,0]])})
-    # add Pauli Z
-    operator_dict.update({'z':np.array([[1,0],[0,-1]])})
-    return operator_dict
-
-    
-class qubits:
-    def __init__(self,number_of_qubits=1):  # The function used when the object is created.
+    def create_qubits(number_qubits):
         self.number_of_qubits=number_of_qubits
         self.state=np.zeros(2**number_of_qubits) # construct the state vector
         self.state[0]=1 #start in the ground state
-    
+        
+        
+    def read_instruction_line(instructions):
+        """
+        In: instructions 
+        read the first line
+        recognize the operation and qubit
+        ---
+        Out: list with operation as first entry and list of qubit(s) as second entry
+        """
+        if instructions!=[]:
+            instruction_line=str(instructions[0])
+            instruction = instruction_line.split()
+            operator = instruction[0]
+            qubits = instruction[1].split(",")   
+        return [operator, [qubits]]
+
+    def read_qubits_string(qubits):
+        """
+        In: list with qubit names
+        ----
+        Out: returns a list with qubit numbers
+        """
+        qubit_numbers=[]
+        for i in range(len(qubits)-1):
+            name=qubits[i]
+            number=name[1:len(name)-1]
+            qubit_numbers[i]=number
+        return qubit_numbers
+
+    def single_qubit_gate(gate,qubit_number,number_of_qubits):
+        '''
+        In: which gate is to be applied, qubit_number: which qubit is acted on (first qubit is 0), number_of_qubits: total number of qubits
+        ---
+        Out: Process matrix with dimension 2**number_of_qubits x 2**number_of_qubits
+        '''
+        gate_dict=operator_dict_default()
+        single_qubit_gate=gate_dict[gate]
+        if qubit_number==0:
+            matrix=single_qubit_gate
+        else:
+            matrix=gate_dict['i']
+        for tt in range(1,number_of_qubits):
+            if tt==qubit_number:
+                matrix=np.kron(matrix,single_qubit_gate)
+            else:
+                matrix=np.kron(matrix,gate_dict['i'])
+        return matrix
+
+    def cnot_gate(control,target,number_of_qubits):
+        '''
+        In: control qubit, starting with 0, target qubit, starting with 0, number of qubits
+        ---
+        Out: Matrix for the gate
+        '''
+        return qip.cnot(N=number_of_qubits, control=control, target=target)
+
+
+    def operator_dict_default():
+        """
+        In: none
+        Creates a dictionary with default operations
+        Out: none
+        """
+        operator_dict={}
+        # add hadamard
+        operator_dict.update({'h':1/np.sqrt(2)*np.array([[1,1],[1,-1]])})
+        # add identity
+        operator_dict.update({'i':np.array([[1,0],[0,1]])})
+        # add Pauli X
+        operator_dict.update({'x':np.array([[0,1],[1,0]])})
+        # add Pauli Y
+        operator_dict.update({'y':np.array([[0,-1j],[1j,0]])})
+        # add Pauli Z
+        operator_dict.update({'z':np.array([[1,0],[0,-1]])})
+        return operator_dict
+
