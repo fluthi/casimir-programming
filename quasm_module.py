@@ -11,6 +11,7 @@ class qasm:
         self.qasm_instruction_line=[]
         self.last_qubit_line_index=int(0)
         self.number_of_qubits=1
+        self.probability_vector=([0,1])
         self.state=np.array([0,1])
         self.gate_dict=self.operator_dict_default()
         pass
@@ -187,3 +188,7 @@ class qasm:
         operator_dict.update({'z':np.array([[1,0],[0,-1]])})
         return operator_dict
 
+    def get_probability_vector(self):
+        self.probability_vector=self.state**2
+        
+    
