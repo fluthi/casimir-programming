@@ -1,6 +1,8 @@
 import numpy as np
 import qutip
 from qutip import qip
+from random import random
+from bisect import bisect
 
    
 class qasm:
@@ -208,6 +210,15 @@ class qasm:
         self.probability_vector=self.state**2
         
     
-    def measure(self,prob_vector):
-        self.probability_vector
-        return measurement_outcome
+    def measure(self):
+        weights=self.probability_vector
+        values=range(self.number_of_qubits)
+        total = 0
+        cum_weights = []
+        for w in weights:
+            total += w
+            cum_weights.append(total)
+        x = random() * total
+        i = bisect(cum_weights, x)
+        return values[i]
+
